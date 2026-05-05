@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.py
+dist/
+build/
+
+# Environments
+.venv/
+venv/
+.env/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# logs
+*.log
+*.tmp
+
+# data
+data/
+7890488/
+
+.pem
+.key
+
+
+!outputs/
+!outputs/reports/
+!outputs/reports/*.ipynb
+!outputs/metrics/
+!outputs/metrics/*.csv
+!outputs/metrics/*.json
+!outputs/models/
+!outputs/models/*
+
+7890488/

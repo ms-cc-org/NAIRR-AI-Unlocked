@@ -1,0 +1,83 @@
+#!/bin/bash
+#SBATCH -A YOUR_ALLOCATION
+#SBATCH -p ai
+#SBATCH -N 1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --gres=gpu:1
+#SBATCH --mem=32G
+#SBATCH --time=04:00:00
+#SBATCH -J forecast_gpu
+#SBATCH -o results/benchmarks/slurm_%j.out
+#SBATCH -e results/benchmarks/slurm_%j.err
+
+set -eo pipefail
+
+echo "START: $(date -Is)"
+echo "HOST: $(hostname)"
+echo "PWD: $(pwd)"
+
+echo "SLURM_JOB_ID: $SLURM_JOB_ID"
+echo "SLURM_JOB_NAME: $SLURM_JOB_NAME"
+echo "SLURM_JOB_ACCOUNT: $SLURM_JOB_ACCOUNT"
+
+module purge
+module load modtree/gpu
+module load anaconda
+module load cuda
+
+source "$(conda info --base)/etc/profile.d/conda.sh"
+
+conda activate anvil-forecast
+
+export PLATFORM_LABEL="Anvil"
+export N_CITIES=210
+export EPOCHS=50
+export BATCH_SIZE=8192
+
+export WIDTH=1024
+export DEPTH=8
+export DROPOUT=0.1
+
+export LAGS="1,3,7,14,30,60"
+export ROLLS="7,30"
+
+export NUM_WORKERS=${SLURM_CPUS_PER_TASK:-8}
+export PREFETCH_FACTOR=4
+export SEED=42
+
+echo "CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES"
+mkdir -p outputs/reports results/benchmarks outputs/metrics outputs/models results/system
+nvidia-smi > results/benchmarks/nvidia_smi_anvil.txt 2>&1 || true
+
+nvidia-smi --query-gpu=timestamp,name,utilization.gpu,utilization.memory,memory.used,memory.total \
+  --format=csv -l 1 > results/benchmarks/gpu_metrics.csv &
+GPU_PID=$!
+
+rm -f outputs/reports/forecasting.anvil.executed.ipynb
+
+/usr/bin/time -v python -m nbconvert --to notebook --execute forecasting.ipynb \
+  --ExecutePreprocessor.timeout=7200 \
+  --output outputs/reports/forecasting.anvil.executed.ipynb \
+  > results/benchmarks/nbconvert_stdout_anvil.txt \
+  2> results/benchmarks/nbconvert_stderr_anvil.txt
+
+kill $GPU_PID 2>/dev/null || true
+wait $GPU_PID 2>/dev/null || true
+
+{
+  echo "DATE: $(date -Is)"
+  echo "GIT_COMMIT: $(git rev-parse HEAD)"
+  echo "HOST: $(hostname)"
+  echo "OS: $(uname -a)"
+  echo "CPU: $(lscpu)"
+  echo "MEM: $(free -h)"
+  echo "DISK: $(df -h)"
+  echo "CONDA: $(conda --version)"
+  echo "ACTIVE_ENV: $CONDA_DEFAULT_ENV"
+  echo "PYTHON: $(which python)"
+  echo "JUPYTER: $(which jupyter)"
+} > results/system/anvil_env_snapshot.txt
+
+echo "Job finished"
+date
