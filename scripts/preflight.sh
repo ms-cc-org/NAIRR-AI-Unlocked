@@ -4,15 +4,15 @@ set -euo pipefail
 platform="${1:-}"
 
 if [ -z "$platform" ]; then
-  echo "Usage: bash scripts/preflight.sh <jetstream2|aws|bridges2|delta|anvil>"
+  echo "Usage: bash scripts/preflight.sh <jetstream2|anvil>"
   exit 2
 fi
 
 case "$platform" in
-  jetstream2|aws|bridges2|delta|anvil) ;;
+  jetstream2|anvil) ;;
   *)
     echo "Unknown platform: $platform"
-    echo "Expected one of: jetstream2, aws, bridges2, delta, anvil"
+    echo "Expected one of: JetStream2 and Anvil"
     exit 2
     ;;
 esac
@@ -52,7 +52,7 @@ else
   echo "nvidia-smi not found; this is expected on CPU-only tests."
 fi
 
-if [ "$platform" = "bridges2" ] || [ "$platform" = "delta" ] || [ "$platform" = "anvil" ]; then
+if [ "$platform" = "anvil" ]; then
   echo
   echo "== Slurm =="
   command -v sbatch || true

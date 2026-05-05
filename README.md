@@ -1,12 +1,11 @@
-# NAIRR ML Workflows
+# NAIRR AI Unlocked Tutorial
 
 This repository demonstrates a **reproducible machine learning workflow** designed to run across multiple compute environments such as Anvil and JetStream2.
 
 
-
 ## Workshop quickstart
 
-If you are using this repository in a workshop, start with:
+If you are using this repository in a workshop/tutorial, start with:
 
 - [WORKSHOP.md](WORKSHOP.md)
 - [docs/platforms.md](docs/platforms.md)
@@ -78,13 +77,6 @@ Platform-specific assets live under:
   - `docs/` execution guide
   - `env_exports/` environment export
   - `scripts/` or `slurm/` run wrappers or Slurm job scripts
-
-Execution evidence (executed notebooks + benchmarks + system snapshots) is archived under:
-- `runs/<platform>/<YYYY-MM-DD>/`
-
-and contains:
-- outputs/ (models, metrics, executed notebooks)
-- results/ (benchmarks, system logs, execution evidence)
 
 ## Benchmarking approach
 
