@@ -5,7 +5,7 @@ channels:
   - nvidia
 dependencies:
   - python=3.10
-  - numpy
+  - numpy=1.26.4
   - pandas
   - scikit-learn
   - matplotlib
@@ -14,7 +14,7 @@ dependencies:
   - jupyterlab
   - nbconvert
   - ipykernel
-  - pytorch=2.0.*
+  - pytorch=2.2.*
   - torchvision
   - torchaudio
   - pytorch-cuda=12.1
