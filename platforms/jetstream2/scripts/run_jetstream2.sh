@@ -9,7 +9,7 @@ echo "Activating conda..."
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate js2-gpu-forecast
 
-mkdir -p outputs/reports results/system results/benchmarks
+mkdir -p outputs/reports results/system results/benchmarks outputs/metrics outputs/models
 
 export PLATFORM_LABEL="${PLATFORM_LABEL:-JetStream2}"
 export N_CITIES="${N_CITIES:-210}"
@@ -23,6 +23,8 @@ export ROLLS="${ROLLS:-7,30}"
 export NUM_WORKERS="${NUM_WORKERS:-8}"
 export PREFETCH_FACTOR="${PREFETCH_FACTOR:-4}"
 export SEED="${SEED:-42}"
+
+scripts/env_validation.sh || { echo "Environment not validated"; exit 1; }
 
 echo "Running notebook..."
 /usr/bin/time -v jupyter nbconvert \

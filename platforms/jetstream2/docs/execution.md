@@ -23,8 +23,8 @@ Verify GPU:
 
     mkdir -p ~/repos
     cd ~/repos
-    git clone https://github.com/ms-cc-org/NAIRR-workflows.git
-    cd NAIRR-workflows
+    git clone https://github.com/ms-cc-org/NAIRR-AI-Unlocked.git
+    cd NAIRR-AI-Unlocked
     git rev-parse HEAD
 
 ---

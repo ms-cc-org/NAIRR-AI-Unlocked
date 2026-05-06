@@ -24,7 +24,7 @@ On the system where you will run the workflow:
 ```bash
 mkdir -p ~/repos
 cd ~/repos
-git clone https://github.com/ms-cc-org/NAIRR-workflows.git
+git clone https://github.com/ms-cc-org/NAIRR-AI-Unlocked.git
 cd NAIRR-workflows
 ```
 
@@ -86,7 +86,7 @@ fresh Python 3.10 environment and install the minimum packages:
 conda create -n <environment-name> python=3.10 -y
 conda activate <environment-name>
 conda install -y -c conda-forge pandas numpy scikit-learn jupyter nbconvert ipykernel tqdm joblib
-conda install -y -c pytorch -c nvidia pytorch pytorch-cuda=12.1 torchvision torchaudio
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 python -m ipykernel install --user --name <kernel-name> --display-name "<kernel-name>"
 ```
 
