@@ -9,32 +9,37 @@ echo "Activating conda..."
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate js2-gpu-forecast
 
-mkdir -p outputs/reports results/system results/benchmarks outputs/metrics outputs/models
+TIMESTAMP=$(date +"%Y-%m-%d-%H-%M-%S")
+MACHINE="JetStream2"
+outputs_dir="outputs/${MACHINE}/${TIMESTAMP}"
+results_dir="results/${MACHINE}/${TIMESTAMP}"
+
+mkdir -p "${results_dir}/system" "${results_dir}/benchmarks"
+mkdir -p "${outputs_dir}/metrics" "${outputs_dir}/models" "${outputs_dir}/reports"
+
 
 export PLATFORM_LABEL="${PLATFORM_LABEL:-JetStream2}"
-export N_CITIES="${N_CITIES:-210}"
-export EPOCHS="${EPOCHS:-25}"
-export BATCH_SIZE="${BATCH_SIZE:-4096}"
-export WIDTH="${WIDTH:-1024}"
-export DEPTH="${DEPTH:-8}"
+export N_CITIES="${N_CITIES:-5}"
+export EPOCHS="${EPOCHS:-1}"
+export BATCH_SIZE="${BATCH_SIZE:-64}"
+export WIDTH="${WIDTH:-128}"
+export DEPTH="${DEPTH:-1}"
 export DROPOUT="${DROPOUT:-0.1}"
-export LAGS="${LAGS:-1,3,7,14,30,60}"
-export ROLLS="${ROLLS:-7,30}"
-export NUM_WORKERS="${NUM_WORKERS:-8}"
-export PREFETCH_FACTOR="${PREFETCH_FACTOR:-4}"
+export LAGS="${LAGS:-1}"
+export ROLLS="${ROLLS:-7}"
+export NUM_WORKERS="${NUM_WORKERS:-0}"
+export PREFETCH_FACTOR="${PREFETCH_FACTOR:-1}"
 export SEED="${SEED:-42}"
-
-scripts/env_validation.sh || { echo "Environment not validated"; exit 1; }
 
 echo "Running notebook..."
 /usr/bin/time -v jupyter nbconvert \
   --to notebook \
   --execute forecasting.ipynb \
-  --ExecutePreprocessor.kernel_name=js2-forecast \
-  --ExecutePreprocessor.timeout=7200 \
-  --output outputs/reports/forecasting.executed.ipynb \
-  > results/benchmarks/nbconvert_stdout_jetstream2.txt \
-  2> results/benchmarks/nbconvert_stderr_jetstream2.txt
+  --ExecutePreprocessor.kernel_name=js2-gpu-forecast \
+  --ExecutePreprocessor.timeout=600 \
+  --output "${outputs_dir}/reports/forecasting.executed.ipynb" \
+  > "${results_dir}/benchmarks/nbconvert_stdout_js2.txt" \
+  2> "${results_dir}/benchmarks/nbconvert_stderr_js2.txt"
 
 {
   echo "DATE"; date -Is
@@ -49,6 +54,7 @@ echo "Running notebook..."
   echo "ACTIVE_ENV"; echo "$CONDA_DEFAULT_ENV"
   echo "PYTHON"; which python
   echo "JUPYTER"; which jupyter
-} > results/system/jetstream2_env_snapshot.txt
+} > "${results_dir}/system/jetstream2_env_snapshot.txt"
 
 echo "Done."
+

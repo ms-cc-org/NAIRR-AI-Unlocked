@@ -1,0 +1,2 @@
+Run ID,Platform,Instance,CPU/GPU,GPU Name,Time per Epoch (sec),Total Training Time (min),Peak Memory (MB),GPU Utilization,Cost per Run,Speedup vs CPU
+20260507_192206Z,JetStream2,ai-unlocked-test,CPU,,79.66312727700279,1.3277316246834137,,N/A (CPU),,
