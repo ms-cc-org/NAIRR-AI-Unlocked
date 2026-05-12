@@ -51,6 +51,7 @@ You should then land inside the JetStream2 instance as the ubuntu user.
 
 Inside the JetStream2 instance:
 - Create a folder to clone the repo: `mkdir -p ~/{folder-name}`
+- `Make sure to replace the folder name placeholder while executing {folder-name}`
 - Go into the folder: `cd ~/{folder-name}`
 - Clone the repo: `git clone https://github.com/ms-cc-org/NAIRR-AI-Unlocked.git`
 - Open the repo: `cd NAIRR-AI-Unlocked`
@@ -118,7 +119,7 @@ if torch.cuda.is_available():
 PY
 ```
 
-## 10. Run a small test 
+## 10. Run a smoke test 
 Use this before running a full benchmark.
 This confirms that:
 - the repo is cloned correctly
