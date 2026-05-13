@@ -41,7 +41,6 @@ Workshop focus areas include:
 - AI research workflows and reproducibility
 - Cloud and HPC onboarding
 - AI-assisted coding and AI literacy
-- Equitable access to AI infrastructure
 - Workforce development, with particular attention to emerging research institutions including HBCUs, TCUs, and MSIs
 
 ---
@@ -152,6 +151,8 @@ The workflow is also adaptable to other ACCESS resources and national cyberinfra
 ---
 
 ## Quick Start
+
+For each platform (Jetstream or Anvil): 
 
 ### 1. Clone the Repository
 
