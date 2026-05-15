@@ -11,11 +11,13 @@ Remember, that any HPC has 2 different nodes:
 
 ---
 
-## Login
+## Login to Anvil
 
 From your system:
 
-`ssh username@anvil.rcac.purdue.edu`
+`ssh <your-username>@anvil.rcac.purdue.edu`
+
+For your allocation name and type, enter `mybalance`.
 
 ---
 ## Setting up your HPC
@@ -28,80 +30,118 @@ cd NAIRR-AI-Unlocked
 ```
 
 ---
+## Prepare the Dataset Folder
+The notebook expects the dataset folder to exist in the repository root as: 7890488/
+From inside the repo: `mkdir -p 7890488`
+
+### Upload the Dataset from Your Local Computer
+Run this command from your local computer, **not from Anvil**:
+`rsync -avP /path/to/7890488/ <your_username>@anvil.rcac.purdue.edu:~/tutorial/NAIRR-AI-Unlocked/7890488/`
+Add the dataset folder to .gitignore so you do not accidentally commit data
+
+
+---
 
 ## Module setup
 
 As HPCs use module command.
 
-```
-module avail
+To see available libraries: `module avail`
 
-module load anaconda
+`module load anaconda`
 or
-module load anaconda/2025.06-py313
+`module load anaconda/2025.06-py313`
 
-If CUDA modules exist:
-module avail cuda
-module load cuda
-```
+Enable conda activation: source `$(conda info --base)/etc/profile.d/conda.sh`
+
+Restart the session: `source ~/.bashrc`
+
+Confirm conda works: `conda --version`
+
 ---
-## Conda
+## Conda environment
 
-```
+```bash
 conda create -n anvil-forecast python=3.10 -y
 conda activate anvil-forecast
 
 conda install -y -c conda-forge pandas numpy scikit-learn jupyter nbconvert ipykernel tqdm joblib
 
-conda install -y -c pytorch -c nvidia pytorch pytorch-cuda=12.1 torchvision torchaudio
 ```
+
+### PyTorch Installation and Kernel Registration
+
+`pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`
+
+Test PyTorch import:
+
+```bash
+python - << 'PY'
+import torch
+print("torch version:", torch.__version__)
+print("Cuda available:", torch.cuda.is_available())
+print("cuda version: ", torch.version.cuda)
+PY
+```
+
+`python -m ipykernel install --user --name anvil-forecast --display-name "anvil-forecast"`
+
+**Create output folders:** 
+
+From the repo root: `cd ~/repos/NAIRR-AI-Unlocked`
+
+`mkdir -p results/benchmarks results/system outputs/reports outputs/metrics outputs/models`
 
 ---
-## Dataset (Can be different based on your dataset)
 
-The notebook expects the dataset at `7890488/` in the repository root.
+## Edit Slurm script
 
-From your system. To do this you have to have :
-```
-rsync -avP /path/to/7890488/ <username>@anvil.rcac.purdue.edu:~/repos/NAIRR-workflows/7890488/
-```
+There is already an existing slurm script.
 
-## Sbatch script
+Make sure you are on the repo: `cd ~/repos/NAIRR-workflows`
 
-**On HPC:**
+To see the slurm script from your terminal: `cat platforms/anvil/slurm/run_anvil_gpu.slurm`
 
-```
-cd ~/repos/NAIRR-workflows
-mkdir -p results/system results/benchmarks outputs/reports
-```
+Make sure to edit the allocation name and partition type. To get these two use `mybalance` command.
 
-Use `platforms/anvil/slurm/run_anvil_gpu.slurm`.
+To open the slurm script from your terminal: `nano platforms/anvil/slurm/run_anvil_gpu.slurm`. Then change:
+- The allocation name
+- The partition type
 
-Before submitting, edit this line:
-
-```
-#SBATCH -A YOUR_ALLOCATION
-```
-
-Confirm the partition, GPU type, memory usage, and time limit match your
-allocation.
+Once you edit, `Ctrl + O` to save, press `Enter` and then `Ctrl + X` to exit.
 
 ## Job scheduling
 
 Enter command to submit a job:
 
-```
-mkdir -p results/benchmarks results/system outputs/reports outputs/metrics outputs/models
-sbatch platforms/anvil/slurm/run_anvil_gpu.slurm
-```
+`sbatch platforms/anvil/slurm/run_anvil_gpu.slurm`
 
 You'll get something like `Submitted batch job <job_id>`
 
-You can track the job with `squeue -u $USER`
+## Monitor the Job
+
+Check queue status: `squeue -u $USER`
+
+**Check Slurm output:**
+```bash
+tail -n 80 results/benchmarks/slurm_<job_id>.out
+tail -n 80 results/benchmarks/slurm_<job_id>.err
+```
+**Check notebook execution logs:**
+```bash
+tail -n 80 results/benchmarks/nbconvert_stderr_anvil.txt
+tail -n 80 results/benchmarks/nbconvert_stdout_anvil.txt
+```
+**A successful run shows:**
+```bash
+[NbConvertApp] Writing ... to outputs/reports/forecasting.anvil.executed.ipynb
+Exit status: 0
+```
+That is the key success signal.
 
 ## Git Commit
-```
-conda env export > platforms/anvil/env_exports/anvil-forecast.yml
+```bash
+conda env export --from-history > platforms/anvil/env_exports/anvil-forecast.yml
 git add outputs/reports/forecasting.anvil.executed.ipynb
 git add results/benchmarks/*anvil*
 git add results/system/anvil_env_snapshot.txt
