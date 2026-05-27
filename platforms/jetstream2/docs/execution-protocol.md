@@ -86,18 +86,9 @@ Then you should see: `js2-gpu-forecast`
 
 ## 7. Stage the Dataset
 
-From inside the repo, create the dataset folder:
-`mkdir -p 7890488`
+From inside the repo, create the dataset folder: `mkdir -p data`
 
-To get the path, use `pwd`
-
-From your local machine open another terminal or cmd, copy the dataset to JetStream2:
-`rsync -avP /path/to/7890488/ ubuntu@<PUBLIC_IP>:~/{folder-name}/NAIRR-AI-Unlocked/7890488/`
-
-For example: `rsync -avP ~/Downloads/7890488/ ubuntu@149.165.xxx.xxx:~/{folder-name}/NAIRR-AI-Unlocked/7890488/`
-
-Back on JetStream2, verify the dataset:
-`cd ~/{folder-name}/NAIRR-AI-Unlocked`
+Clone the dataset directly: `git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git data/temperature-us`
 
 ## 8. Create Output Folders Before Running
 `mkdir -p outputs/reports outputs/metrics outputs/models results/benchmarks results/system`

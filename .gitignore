@@ -22,6 +22,7 @@ env/
 
 # data
 data/
+data/temperature-us/
 7890488/
 
 .pem
@@ -36,5 +37,3 @@ data/
 !outputs/metrics/*.json
 !outputs/models/
 !outputs/models/*
-
-7890488/

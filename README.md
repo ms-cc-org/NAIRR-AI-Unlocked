@@ -163,17 +163,13 @@ cd NAIRR-AI-Unlocked
 
 ### 2. Stage the Dataset
 
-The notebook expects the dataset at `7890488/` in the repository root. On platforms with internet access:
+The forecasting workflow requires a historical temperature dataset convering 210 US cities. The notebook expects at `data/tempareture-us/` in the repo root.
+
+**Clone the dataset directly from GitHub:**
 
 ```bash
-git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git 7890488_src
-rsync -avP 7890488_src/ 7890488/
-```
-
-Alternatively, transfer from a local copy:
-
-```bash
-rsync -avP /path/to/7890488/ <user>@<host>:~/NAIRR-AI-Unlocked/7890488/
+mkdir -p data
+git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git data/temperature-us
 ```
 
 ### 3. Create the Conda Environment

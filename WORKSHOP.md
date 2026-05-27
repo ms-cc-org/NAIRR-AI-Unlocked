@@ -25,7 +25,7 @@ On the system where you will run the workflow:
 mkdir -p ~/repos
 cd ~/repos
 git clone https://github.com/ms-cc-org/NAIRR-AI-Unlocked.git
-cd NAIRR-workflows
+cd NAIRR-AI-Unlocked
 ```
 
 ## 3. Stage the dataset
@@ -33,32 +33,27 @@ cd NAIRR-workflows
 The notebook expects the temperature dataset at:
 
 ```text
-7890488/
+data/temperature-us/
 ```
 
 The expected files include:
 
 ```text
-7890488/city_info.csv
-7890488/*.csv
+data/temperature-us/city_info.csv
+data/temperature-us/*.csv
+```
+
+**Dataset cloning from GitHub**
+
+```bash
+mkdir -p data
+git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git data/temperature-us
 ```
 
 If you already have the dataset locally, transfer it to the remote platform:
 
 ```bash
-rsync -avP /path/to/7890488/ <user>@<host>:~/repos/NAIRR-workflows/7890488/
-```
-
-On VM-style platforms with outbound internet access, you can also mirror the
-public source:
-
-```bash
-mkdir -p ~/data
-cd ~/data
-git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git 7890488_src
-cd ~/repos/NAIRR-workflows
-mkdir -p 7890488
-rsync -avP ~/data/7890488_src/ ./7890488/
+rsync -avP /path/to/7890488/ <user>@<host>:~/repos/NAIRR-AI-Unlocked/data/temperature-us/
 ```
 
 The dataset directory is intentionally ignored by Git.

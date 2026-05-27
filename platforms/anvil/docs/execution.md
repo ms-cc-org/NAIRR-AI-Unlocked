@@ -31,15 +31,10 @@ cd NAIRR-AI-Unlocked
 
 ---
 ## Prepare the Dataset Folder
-The notebook expects the dataset folder to exist in the repository root as: 7890488/
-From inside the repo: `mkdir -p 7890488`
+The notebook expects the dataset folder to exist in the repository root as: `data/temparature-us/`
+From inside the repo: `mkdir -p data`
 
-### Upload the Dataset from Your Local Computer
-Run this command from your local computer, **not from Anvil**:
-`rsync -avP /path/to/7890488/ <your_username>@anvil.rcac.purdue.edu:~/tutorial/NAIRR-AI-Unlocked/7890488/`
-Add the dataset folder to .gitignore so you do not accidentally commit data
-
-
+From inside the repo, clone the dataset directly: `git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git data/temperature-us`
 ---
 
 ## Module setup

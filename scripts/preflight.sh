@@ -23,11 +23,11 @@ git status --short
 
 echo
 echo "== Dataset =="
-if [ -f "7890488/city_info.csv" ]; then
-  csv_count="$(find 7890488 -maxdepth 1 -name '*.csv' | wc -l | tr -d ' ')"
-  echo "Found 7890488/city_info.csv and ${csv_count} CSV files."
+if [ -f "data/temperature-us/city_info.csv" ]; then
+  csv_count="$(find data/temperature-us -maxdepth 1 -name '*.csv' | wc -l | tr -d ' ')"
+  echo "Found data/temperature-us/city_info.csv and ${csv_count} CSV files."
 else
-  echo "Missing 7890488/city_info.csv"
+  echo "Missing data/temperature-us/city_info.csv"
   echo "Stage the dataset before running the notebook."
 fi
 
