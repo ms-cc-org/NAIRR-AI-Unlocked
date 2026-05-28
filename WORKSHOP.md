@@ -32,29 +32,39 @@ cd NAIRR-AI-Unlocked
 
 The notebook expects the temperature dataset at:
 
-```text
+```bash
 data/temperature-us/
 ```
 
 The expected files include:
 
-```text
+```bash
 data/temperature-us/city_info.csv
 data/temperature-us/*.csv
 ```
 
-**Dataset cloning from GitHub**
+### Stage the Dataset
 
+The forecasting workflow requires a historical temperature dataset convering 210 US cities. The notebook expects at `data/tempareture-us/` in the repo root.
+
+**Download the dataset from link:** https://kilthub.cmu.edu/articles/dataset/Compiled_daily_temperature_and_precipitation_data_for_the_U_S_cities/7890488
+
+**Size:** 292 MB
+
+**On VM/HPC:**
 ```bash
+cd ~/MSCCAM/NAIRR-AI-Unlocked
 mkdir -p data
-git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git data/temperature-us
 ```
 
-If you already have the dataset locally, transfer it to the remote platform:
+To get the paths:
+- Use `pwd` on Mac
+- Use `cd` on Windows
 
-```bash
-rsync -avP /path/to/7890488/ <user>@<host>:~/repos/NAIRR-AI-Unlocked/data/temperature-us/
-```
+Run this command from a new command prompt or terminal:
+`rsync -avP path / to /7890488/ ubuntu@<IP>:~/MSCCAM/NAIRR-AI-Unlocked/data/temperature-us/`
+
+**Verify on VM/HPC:** `ls -1 data/temperature-us/*.csv | wc -l  # Should output 211`
 
 The dataset directory is intentionally ignored by Git.
 

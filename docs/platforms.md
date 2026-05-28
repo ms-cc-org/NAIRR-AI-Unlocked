@@ -17,5 +17,4 @@ bash platforms/jetstream2/scripts/run_jetstream2.sh
 sbatch platforms/anvil/slurm/run_anvil_gpu.slurm
 ```
 
-Before running, stage the dataset at `7890488/` and create the platform Conda
-environment from `platforms/<platform>/env_exports/`.
+Before running, stage the dataset at `data/temperature-us` and create the platform Conda environment from `platforms/<platform>/env_exports/`.

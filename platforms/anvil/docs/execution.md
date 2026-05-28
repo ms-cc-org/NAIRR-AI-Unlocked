@@ -34,7 +34,22 @@ cd NAIRR-AI-Unlocked
 The notebook expects the dataset folder to exist in the repository root as: `data/temparature-us/`
 From inside the repo: `mkdir -p data`
 
-From inside the repo, clone the dataset directly: `git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git data/temperature-us`
+**Download the dataset from link:** https://kilthub.cmu.edu/articles/dataset/Compiled_daily_temperature_and_precipitation_data_for_the_U_S_cities/7890488
+
+**On VM:**
+```bash
+cd ~/MSCCAM/NAIRR-AI-Unlocked
+mkdir -p data
+```
+
+To get the paths:
+- Use `pwd` on Mac
+- Use `cd` on Windows
+
+Run this command from a new command prompt or terminal **not on the VM**:
+`rsync -avP path / to /7890488/ ubuntu@<IP>:~/MSCCAM/NAIRR-AI-Unlocked/data/temperature-us/`
+
+**Verify on VM/HPC:** `ls -1 data/temperature-us/*.csv | wc -l`  # Should output 211
 ---
 
 ## Module setup

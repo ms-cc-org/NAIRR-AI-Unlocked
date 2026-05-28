@@ -86,9 +86,22 @@ Then you should see: `js2-gpu-forecast`
 
 ## 7. Stage the Dataset
 
-From inside the repo, create the dataset folder: `mkdir -p data`
+**Download the dataset from link:** https://kilthub.cmu.edu/articles/dataset/Compiled_daily_temperature_and_precipitation_data_for_the_U_S_cities/7890488
 
-Clone the dataset directly: `git clone --depth 1 https://github.com/radames/dataset-historical-daily-temperature-210-US.git data/temperature-us`
+**On HPC:**
+```bash
+cd ~/MSCCAM/NAIRR-AI-Unlocked
+mkdir -p data
+```
+
+To get the paths:
+- Use `pwd` on Mac
+- Use `cd` on Windows
+
+Run this command from a new command prompt or terminal **not HPC**:
+`rsync -avP path / to /7890488/ ubuntu@<IP>:~/MSCCAM/NAIRR-AI-Unlocked/data/temperature-us/`
+
+**Verify on HPC:** `ls -1 data/temperature-us/*.csv | wc -l`  # Should output 211
 
 ## 8. Create Output Folders Before Running
 `mkdir -p outputs/reports outputs/metrics outputs/models results/benchmarks results/system`

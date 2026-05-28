@@ -45,15 +45,24 @@ Verify GPU inside Python:
 
 ## 4. Stage Dataset
 
-The notebook expects the dataset at `7890488/` in the repository root.
+The notebook expects the dataset at `data/temperature-us/` in the repository root.
 
-From local machine:
+**Download the dataset from link:** https://kilthub.cmu.edu/articles/dataset/Compiled_daily_temperature_and_precipitation_data_for_the_U_S_cities/7890488
 
-    rsync -avP /path/to/7890488/ ubuntu@<PUBLIC_IP>:~/data/7890488/
+**On VM:**
+```bash
+cd ~/MSCCAM/NAIRR-AI-Unlocked
+mkdir -p data
+```
 
-Link inside project:
+To get the paths:
+- Use `pwd` on Mac
+- Use `cd` on Windows
 
-    ln -sfn ~/data/7890488 7890488
+Run this command from a new command prompt or terminal **not on the VM**:
+`rsync -avP path / to /7890488/ ubuntu@<IP>:~/MSCCAM/NAIRR-AI-Unlocked/data/temperature-us/`
+
+**Verify on VM/HPC:** `ls -1 data/temperature-us/*.csv | wc -l  # Should output 211`
 
 ---
 
