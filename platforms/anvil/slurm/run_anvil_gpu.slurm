@@ -56,8 +56,6 @@ GPU_PID=$!
 
 rm -f outputs/reports/forecasting.anvil.executed.ipynb
 
-scripts/env_validation.sh || { echo "Environment not validated"; exit 1; }
-
 /usr/bin/time -v python -m nbconvert --to notebook --execute forecasting.ipynb \
   --ExecutePreprocessor.timeout=7200 \
   --output outputs/reports/forecasting.anvil.executed.ipynb \

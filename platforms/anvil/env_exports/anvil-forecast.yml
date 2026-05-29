@@ -1,20 +1,18 @@
 name: anvil-forecast
 channels:
   - conda-forge
-  - pytorch
-  - nvidia
 dependencies:
   - python=3.10
-  - numpy
   - pandas
+  - numpy
   - scikit-learn
-  - matplotlib
-  - tqdm
-  - joblib
-  - jupyterlab
+  - jupyter
   - nbconvert
   - ipykernel
-  - pytorch=2.5
-  - torchvision
-  - torchaudio
-  - pytorch-cuda=12.1
+  - tqdm
+  - joblib
+  - pip
+  - pip:
+    - torch==2.5.1+cu118
+    - torchvision==0.20.1+cu118
+    - torchaudio==2.5.1+cu118

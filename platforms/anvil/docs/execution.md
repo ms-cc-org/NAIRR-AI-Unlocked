@@ -23,8 +23,8 @@ For your allocation name and type, enter `mybalance`.
 ## Setting up your HPC
 
 ```
-mkdir -p ~/repos
-cd ~/repos
+mkdir -p ~/MSCCAM
+cd ~/MSCCAM
 git clone https://github.com/ms-cc-org/NAIRR-AI-Unlocked.git
 cd NAIRR-AI-Unlocked
 ```
@@ -32,7 +32,6 @@ cd NAIRR-AI-Unlocked
 ---
 ## Prepare the Dataset Folder
 The notebook expects the dataset folder to exist in the repository root as: `data/temparature-us/`
-From inside the repo: `mkdir -p data`
 
 **Download the dataset from link:** https://kilthub.cmu.edu/articles/dataset/Compiled_daily_temperature_and_precipitation_data_for_the_U_S_cities/7890488
 
@@ -47,9 +46,10 @@ To get the paths:
 - Use `cd` on Windows
 
 Run this command from a new command prompt or terminal **not on the VM**:
-`rsync -avP path / to /7890488/ ubuntu@<IP>:~/MSCCAM/NAIRR-AI-Unlocked/data/temperature-us/`
+`rsync -avP path / to /7890488/ <your-username>@anvil.rcac.purdue.edu:~/MSCCAM/NAIRR-AI-Unlocked/data/temperature-us/`
 
-**Verify on VM/HPC:** `ls -1 data/temperature-us/*.csv | wc -l`  # Should output 211
+**Verify on VM/HPC:** `ls -1 data/temperature-us/*.csv | wc -l  #Should output 211`
+
 ---
 
 ## Module setup
@@ -62,7 +62,7 @@ To see available libraries: `module avail`
 or
 `module load anaconda/2025.06-py313`
 
-Enable conda activation: source `$(conda info --base)/etc/profile.d/conda.sh`
+Enable conda activation: `source $(conda info --base)/etc/profile.d/conda.sh`
 
 Restart the session: `source ~/.bashrc`
 
@@ -71,19 +71,31 @@ Confirm conda works: `conda --version`
 ---
 ## Conda environment
 
+Create the environment from the Anvil environment file:
+`conda env create -f platforms/anvil/env_exports/anvil-forecast.yml`
+
+Activate it: `conda activate anvil-forecast`
+
+If You See a conda error `CondaError: Run 'conda init' before 'conda activate'`
+
+Follow this sequence:
+- `conda init bash`
+- `source ~/.bashrc`
+- `conda activate anvil-forecast`
+
+Environment installation can also be done manually:
+
 ```bash
 conda create -n anvil-forecast python=3.10 -y
 conda activate anvil-forecast
 
 conda install -y -c conda-forge pandas numpy scikit-learn jupyter nbconvert ipykernel tqdm joblib
 
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
 ```
 
-### PyTorch Installation and Kernel Registration
-
-`pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`
-
-Test PyTorch import:
+**Test PyTorch import:**
 
 ```bash
 python - << 'PY'
@@ -94,11 +106,11 @@ print("cuda version: ", torch.version.cuda)
 PY
 ```
 
-`python -m ipykernel install --user --name anvil-forecast --display-name "anvil-forecast"`
+**Kernel:** `python -m ipykernel install --user --name anvil-forecast --display-name "anvil-forecast"`
 
 **Create output folders:** 
 
-From the repo root: `cd ~/repos/NAIRR-AI-Unlocked`
+From the repo root: `cd ~/MSCCAM/NAIRR-AI-Unlocked`
 
 `mkdir -p results/benchmarks results/system outputs/reports outputs/metrics outputs/models`
 
@@ -108,7 +120,7 @@ From the repo root: `cd ~/repos/NAIRR-AI-Unlocked`
 
 There is already an existing slurm script.
 
-Make sure you are on the repo: `cd ~/repos/NAIRR-workflows`
+Make sure you are on the repo: `cd ~/MSCCAM/NAIRR-workflows`
 
 To see the slurm script from your terminal: `cat platforms/anvil/slurm/run_anvil_gpu.slurm`
 
