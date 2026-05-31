@@ -106,13 +106,14 @@ Confirm the data copied correctly:
 
 ```bash
 ls data/temperature-us/city_info.csv
-wc -l data/temperature-us/city_info.csv
+find data/temperature-us -maxdepth 1 -type f | wc -l
 ```
 
 Expected output:
 
 ```bash
-211 data/temperature-us/city_info.csv
+data/temperature-us/city_info.csv
+212
 ```
 
 If this does not work, raise your hand.

@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH -A YOUR_ALLOCATION
-#SBATCH -p ai
+#SBATCH -A cis260907-gpu
+#SBATCH -p gpu
 #SBATCH -N 1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --gres=gpu:1
 #SBATCH --mem=32G
-#SBATCH --time=04:00:00
+#SBATCH --time=01:00:00
 #SBATCH -J forecast_gpu
 #SBATCH -o results/benchmarks/slurm_%j.out
 #SBATCH -e results/benchmarks/slurm_%j.err
