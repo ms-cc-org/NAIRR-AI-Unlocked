@@ -36,4 +36,4 @@ data/temperature-us/
 !outputs/metrics/*.csv
 !outputs/metrics/*.json
 !outputs/models/
-!outputs/models/*
+!outputs/models/**.swp
