@@ -38,11 +38,21 @@ This takes some getting used to if you are new to HPC, but it is the standard mo
 
 ## Step 1 — Connect and set up your workspace
 
-### SSH into Anvil
+### Option 1: SSH into Anvil from your local terminal
 
 ```bash
 ssh <x-your-access-username>@anvil.rcac.purdue.edu
 ```
+
+### Option 2: Use Anvil Shell Access from the Anvil On Demand dashboard
+
+You can also connect to Anvil through Anvil OnDemand dashboard without a local terminal
+
+- Go to Anvil OnDemand dashboard
+- Signin using your Access ID and password
+- After logging in, Select Clusters from the top menu
+- From the dropdown meny, choose **Anvil Shell Access**
+- A browser shell session will open and connect you to the Anvil system.
 
 You will land on a login node (`anvil-login-xx`). This is where you set up your environment and submit jobs. Do not run training jobs here.
 
@@ -95,13 +105,19 @@ data/temperature-us/ANC.csv
 ... (one CSV per city)
 ```
 
+Create the data directories:
+```bash
+mkdir -p data
+mkdir -p data/temperature-us
+```
+
 ### Option A — Transfer from your local machine (recommended for Anvil)
 
 Anvil compute nodes have restricted outbound internet access, so direct download from the internet is not reliable. Transfer the dataset from your local machine:
 
 ```bash
 # Run this command on your LOCAL machine (not on Anvil)
-rsync -avP /path/to/your/7890488/ \
+rsync -avzP /path/to/your/7890488/ \
   <your-username>@anvil.rcac.purdue.edu:~/repos/NAIRR-AI-Unlocked/data/temperature-us/
 ```
 
@@ -111,7 +127,7 @@ Your facilitator may have pre-staged the dataset in a shared directory on Anvil.
 
 ```bash
 # Run this on Anvil
-cp -r /anvil/projects/x-cis260907/dataset_shared/* ~/repos/NAIRR-AI-Unlocked/temperature-us/
+cp -r /anvil/projects/x-cis260907/dataset_shared/* ~/repos/NAIRR-AI-Unlocked/data/temperature-us/
 ```
 
 ### Verify the dataset is in place
@@ -133,9 +149,9 @@ The workflow requires specific Python and ML library versions. We use a pre-test
 
 ### Create the environment from the provided file
 
-> **Important:** Enter `module avail cuda`, if the terminal returns *No module(s) or extension(s) found!*, then you're probably on CPU module. To swap to GPU module, use: 
+> **Important:** Enter `module avail cuda`, if the terminal returns **No module(s) or extension(s) found!**, then you're probably on CPU module. 
 
-`module swap modtree/cpu modtree/gpu`
+To swap to GPU module, use: `module swap modtree/cpu modtree/gpu`
 
 Then once again try `module avail cuda`, if you get core applications with cuda, the you are on GPU module. 
 
@@ -299,7 +315,7 @@ tail -n 50 results/benchmarks/nbconvert_stderr_anvil.txt
 |---|---|---|
 | `Invalid account` or `Authorization failure` | Wrong allocation code | Re-edit `#SBATCH -A` line in the script |
 | `Invalid partition` | Partition not available on your allocation | Ask facilitator for the correct partition name |
-| `FileNotFoundError: 7890488/city_info.csv` | Dataset not staged | Redo Step 2 |
+| `FileNotFoundError: data/temperature-us/city_info.csv` | Dataset not staged | Redo Step 2 |
 | `ModuleNotFoundError: No module named torch` | Environment not found | Verify `conda activate anvil-forecast` works and the env was built in Step 3 |
 | Job stays in PD for 20+ minutes | Queue backlog | This is normal during peak times; continue waiting or ask facilitator about priority queues |
 
@@ -463,7 +479,7 @@ The Slurm job script pattern is nearly identical on Frontera, Delta, Bridges-2, 
 | `conda: command not found` | Module not loaded | Run `module load anaconda` |
 | `Invalid account or account/partition combination specified` | Wrong allocation code or partition | Double-check `#SBATCH -A` in the script; ask facilitator for valid partition names |
 | Job stays `PD` indefinitely | Queue backlog or resource mismatch | Run `scontrol show job <jobid>` and read the `Reason` field |
-| `FileNotFoundError: 7890488/city_info.csv` | Dataset not staged | Redo Step 2 |
+| `FileNotFoundError: data/temperature-us/city_info.csv` | Dataset not staged | Redo Step 2 |
 | Job fails immediately (exit code 1) | Environment or script error | Read `tail -n 80 results/benchmarks/slurm_<jobid>.err` |
 | `outputs/metrics/` empty after job finishes | nbconvert error | Read `tail -n 80 results/benchmarks/nbconvert_stderr_anvil.txt` |
 | GPU shows 0% utilization in job log | CPU fallback in PyTorch | Verify `torch.cuda.is_available()` in the activated environment; reinstall PyTorch if needed |
