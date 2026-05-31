@@ -2,7 +2,13 @@
 
 This is your complete guide. Everything you need is on this page — you do not need to open any other file.
 
-**What you will do:** SSH into Anvil, set up the workflow environment, submit a GPU training job to the Slurm scheduler, and inspect your results. By the end you will have a benchmark you can compare against other systems and a workflow pattern you can reuse.
+**What you will do:** Log in to Anvil Open OnDemand, Open Anvil Shell Access, Clone the workshop repository, Stage the dataset, Build the Conda environment, Submit a small smoke test job, Submit the full benchmark job, Inspect and download the outputs. 
+
+By the end you will have a benchmark you can compare against other systems and a workflow pattern you can reuse.
+
+You do **not** need local SSH for this workshop. You do **not** need to generate SSH keys. You do **not** need to run commands from your personal laptop terminal.
+
+Everything in this guide is done through the browser-based Anvil Shell Access terminal.
 
 **How long this takes:** About 60–90 minutes for a first run, including environment setup. The training job itself takes 15–25 minutes once it starts running (queue wait time varies).
 
@@ -15,10 +21,6 @@ Work through this checklist before the session. Most workshop delays come from u
 - [ ] You have an ACCESS account at [access-ci.org](https://access-ci.org)
 - [ ] You have an active Anvil allocation — check at [allocations.access-ci.org](https://allocations.access-ci.org)
 - [ ] You know your **ACCESS project code** (it looks like `abc123456` — find it in your allocation details)
-- [ ] You can SSH into Anvil: `ssh <username>@anvil.rcac.purdue.edu`
-- [ ] Conda is available on Anvil: run `module load anaconda` then `conda --version`
-
-**If SSH fails:** Verify your ACCESS username. Anvil uses your ACCESS credentials, not a local Purdue account. Contact [support.access-ci.org](https://support.access-ci.org) if login fails after verifying.
 
 **If your allocation is not listed:** Allocations can take up to 24 hours to activate after approval. If your allocation was recently approved and is not showing up, contact your facilitator.
 
@@ -55,21 +57,6 @@ After you are logged in to the Anvil Open OnDemand dashboard:
 This will open a browser shell session and connect you to the Anvil system.
 
 You will land on a login node (`anvil-login-xx`). This is where you set up your environment and submit jobs. Do not run training jobs here.
-
-### Load the Conda module
-
-Conda is available on Anvil as a module, not installed by default in your PATH:
-
-```bash
-module avail conda
-module load conda/2026.03
-conda --version
-```
-
-You should see a version number such as:
-`conda 26.1.0`
-
-**Note:** You need to load the Conda module in each new Anvil shell session before using `conda`, unless your environment has already loaded it automatically.
 
 ### Clone the repository
 
@@ -219,6 +206,29 @@ Do not submit the job until the dataset is in place. The job will fail immediate
 
 ## Step 3 — Build the Conda environment
 
+### Make sure you are in the repository root
+
+Run:
+```bash
+cd ~/repos/NAIRR-AI-Unlocked
+pwd
+```
+
+### Load the Conda module
+
+Conda is available on Anvil as a module, not installed by default in your PATH:
+
+```bash
+module avail conda
+module load conda/2026.03
+conda --version
+```
+
+You should see a version number such as:
+`conda 26.1.0`
+
+**Note:** You need to load the Conda module in each new Anvil shell session before using `conda`, unless your environment has already loaded it automatically.
+
 The workflow requires specific Python and ML library versions. We use a pre-tested environment definition so you get exactly what was tested on Anvil hardware.
 
 For this tutorial, we use a pre-tested Conda environment file so everyone installs the same package versions that were tested on Anvil.
@@ -232,14 +242,6 @@ For this tutorial, we use a pre-tested Conda environment file so everyone instal
 To swap to GPU module, use: `module swap modtree/cpu modtree/gpu`
 
 Then once again try `module avail cuda`, if you get core applications with cuda, the you are on GPU module. 
-
-### Make sure you are in the repository root
-
-Run:
-```bash
-cd ~/repos/NAIRR-AI-Unlocked
-pwd
-```
 
 ### Environment creation:
 
