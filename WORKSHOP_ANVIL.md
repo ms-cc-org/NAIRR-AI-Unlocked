@@ -38,21 +38,21 @@ This takes some getting used to if you are new to HPC, but it is the standard mo
 
 ## Step 1 — Connect and set up your workspace
 
-### Option 1: SSH into Anvil from your local terminal
 
-```bash
-ssh <x-your-access-username>@anvil.rcac.purdue.edu
-```
+### Open the Anvil OnDemand dashboard
 
-### Option 2: Use Anvil Shell Access from the Anvil On Demand dashboard
+In this tutorial, we will connect to Anvil using Anvil Open OnDemand. This gives you a browser-based shell. Anvil Open OnDemand is a web portal for accessing Anvil through your browser.
 
-You can also connect to Anvil through Anvil OnDemand dashboard without a local terminal
+- Go to [Anvil OnDemand dashboard](https://ondemand.anvil.rcac.purdue.edu/pun/sys/dashboard/)
+- Signin using your ACCESS ID and password
 
-- Go to Anvil OnDemand dashboard
-- Signin using your Access ID and password
-- After logging in, Select Clusters from the top menu
-- From the dropdown meny, choose **Anvil Shell Access**
-- A browser shell session will open and connect you to the Anvil system.
+### Open Anvil Shell Access
+After you are logged in to the Anvil Open OnDemand dashboard:
+- Look the top menu bar
+- Click **Clusters**
+- From the dropdown menu, click **Anvil Shell Access**
+
+This will open a browser shell session and connect you to the Anvil system.
 
 You will land on a login node (`anvil-login-xx`). This is where you set up your environment and submit jobs. Do not run training jobs here.
 
@@ -66,13 +66,14 @@ module load conda/2026.03
 conda --version
 ```
 
-You should see a version number. Add this module load to your `~/.bashrc` so it is available automatically in future sessions:
+You should see a version number such as:
+`conda 26.1.0`
 
-```bash
-echo "module load anaconda" >> ~/.bashrc
-```
+**Note:** You need to load the Conda module in each new Anvil shell session before using `conda`, unless your environment has already loaded it automatically.
 
 ### Clone the repository
+
+Now we will down the tutorial files from GitHub onto Anvil. In your Anvil Shell Access terminal, run: 
 
 ```bash
 mkdir -p ~/repos
@@ -81,71 +82,148 @@ git clone https://github.com/ms-cc-org/NAIRR-AI-Unlocked.git
 cd NAIRR-AI-Unlocked
 ```
 
+Here:
+- `mkdir -p ~/repos` creates a folder named `repos` in your home directory if it does not already exist.
+- `cd ~/repos` moves you into that folder.
+- `git clone ...` downloads the tutorial repository from GitHub.
+- `cd NAIRR-AI-Unlocked` moves you into the downloaded repository folder.
+
 Confirm the clone succeeded:
 `ls`
 
-You should see: `forecasting.ipynb  platforms/  scripts/  outputs/  results/  README.md  WORKSHOP_JETSTREAM2.md  WORKSHOP_ANVIL.md`
+You should see similar to: `docs  forecasting.ipynb  platforms  README.md  scripts  SELFSERVICE_JETSTREAM.md  WORKSHOP_ANVIL.md  WORKSHOP_JETSTREAM2.md`
 
-> **Why this directory structure matters:** Everything in this tutorial runs relative to the repo root (`~/repos/NAIRR-AI-Unlocked`). The Slurm script, the dataset path, and the output directories all assume you are in this directory when you submit. If commands fail with "file not found" errors, the first thing to check is your current directory: run `pwd` and confirm you see `.../NAIRR-AI-Unlocked`.
+> **Why this directory structure matters:** Everything in this tutorial runs relative to the repo root (`~/repos/NAIRR-AI-Unlocked`). The Slurm script, the dataset path, and the output directories all assume you are in this directory when you submit. If commands fail with errors:
+`file not found` 
+ or
+`No such file or directory`  
+
+The first thing to check is your current directory: run `pwd` and confirm you see `.../NAIRR-AI-Unlocked`.
 
 ---
 
 ## Step 2 — Stage the dataset
 
-The notebook trains on historical daily temperature data for 210 US cities. The dataset is not stored in Git (too large), so you need to place it at the path the notebook expects before submitting.
+The notebook trains on historical daily temperature data for U.S. cities.
 
-**The notebook looks for the dataset here:**
+The dataset is not stored in GitHub because it is too large. Before running the notebook or submitting a Slurm job, you must place the dataset in the exact folder expected by the notebook.
+
+### Make sure you are in the repository root
+
+In your Anvil Shell Access terminal, run:
+
+```bash
+cd ~/repos/NAIRR-AI-Unlocked
+pwd
+```
+
+You should see something similar to:
+
+`/home/x-yourusername/repos/NAIRR-AI-Unlocked`
+
+> **Important:** Run the commands in this step from inside the NAIRR-AI-Unlocked repository folder.
+
+### Create the dataset directory
+
+The notebook expects the dataset here:
+
 `data/temperature-us/`
 
-**Expected contents:**
+Create that folder:
+
+`mkdir -p data/temperature-us`
+
+### Copy the dataset from the facilitator-provided path
+
+For this tutorial, the facilitator will provide a shared dataset path on Anvil.
+
+Copy the dataset into your repository:
+
+`cp -r /anvil/projects/x-cis260907/dataset_shared/* ~/repos/NAIRR-AI-Unlocked/data/temperature-us/`
+
+### Verify that the dataset is in the correct location
+
+Run:
+
+`ls data/temperature-us | head -10`
+
+You should see files similar to:
+
+ABQ.csv
+ANC.csv
+ATL.csv
+AUS.csv
+BDL.csv
+BHM.csv
+BNA.csv
+BOI.csv
+BOS.csv
+BUF.csv
+
+Now check that city_info.csv exists:
+
+`ls data/temperature-us/city_info.csv`
+
+You should see:
+
+`data/temperature-us/city_info.csv`
+
+Check the number of lines in city_info.csv:
+
+`wc -l data/temperature-us/city_info.csv`
+
+You should see:
+
+`211 data/temperature-us/city_info.csv`
+
+This means the file has:
+
+1 header row
+210 city rows
+
+### Confirm the folder structure
+
+Your dataset folder should look like this:
+
 ```bash
 data/temperature-us/city_info.csv
 data/temperature-us/ABQ.csv
 data/temperature-us/ANC.csv
-... (one CSV per city)
+data/temperature-us/ATL.csv
+...
 ```
 
-Create the data directories:
-```bash
-mkdir -p data
-mkdir -p data/temperature-us
-```
+The CSV files should be directly inside:
 
-### Option A — Transfer from your local machine (recommended for Anvil)
+`data/temperature-us/`
 
-Anvil compute nodes have restricted outbound internet access, so direct download from the internet is not reliable. Transfer the dataset from your local machine:
+They should not be nested inside another folder such as:
 
-```bash
-# Run this command on your LOCAL machine (not on Anvil)
-rsync -avzP /path/to/your/7890488/ \
-  <your-username>@anvil.rcac.purdue.edu:~/repos/NAIRR-AI-Unlocked/data/temperature-us/
-```
+`data/temperature-us/7890488/`
 
-### Option B — Copy from a facilitator-provided path
+If your files are accidentally nested inside another folder, the notebook may not find them.
 
-Your facilitator may have pre-staged the dataset in a shared directory on Anvil. They will give you the path:
+### Do not proceed if the dataset is missing
 
-```bash
-# Run this on Anvil
-cp -r /anvil/projects/x-cis260907/dataset_shared/* ~/repos/NAIRR-AI-Unlocked/data/temperature-us/
-```
+Before moving to the next step, make sure this command works:
 
-### Verify the dataset is in place
+`ls data/temperature-us/city_info.csv`
 
-```bash
-ls data/temperature-us/ | head -10
-wc -l data/temperature-us/city_info.csv
-```
+If you see an error like:
 
-You should see a list of CSV files and `city_info.csv` should have 211 lines (1 header + 210 cities). If the directory is empty or missing, do not proceed — the job will fail immediately when it runs.
+`No such file or directory`
 
----
+stop here and ask the facilitator for the correct dataset path.
+
+Do not submit the job until the dataset is in place. The job will fail immediately if the dataset folder is empty or missing.
 
 ## Step 3 — Build the Conda environment
 
 The workflow requires specific Python and ML library versions. We use a pre-tested environment definition so you get exactly what was tested on Anvil hardware.
 
-> **Important:** Build the environment on the login node, not in a job. This is one of the few things you do directly on the login node — environment creation does not need a GPU and is not a heavy compute task.
+For this tutorial, we use a pre-tested Conda environment file so everyone installs the same package versions that were tested on Anvil.
+
+> **Important:** Build the environment on the login node. This is one of the few things you do directly on the login node — environment creation does not need a GPU and is not a heavy compute task.
 
 ### Create the environment from the provided file
 
@@ -154,6 +232,14 @@ The workflow requires specific Python and ML library versions. We use a pre-test
 To swap to GPU module, use: `module swap modtree/cpu modtree/gpu`
 
 Then once again try `module avail cuda`, if you get core applications with cuda, the you are on GPU module. 
+
+### Make sure you are in the repository root
+
+Run:
+```bash
+cd ~/repos/NAIRR-AI-Unlocked
+pwd
+```
 
 ### Environment creation:
 
@@ -179,11 +265,11 @@ conda activate anvil-forecast
 **Check PyTorch and Cuda versions:**
 ```bash
 python - <<'PY'
-> import torch
-> print("torch:", torch.__version__)
-> print("cuda available:", torch.cuda.is_available())
-> print("cuda version:", torch.version.cuda)
-> PY
+import torch
+print("torch:", torch.__version__)
+print("cuda available:", torch.cuda.is_available())
+print("cuda version:", torch.version.cuda)
+PY
 ```
 
 When it finishes, you will see:
@@ -193,7 +279,11 @@ cuda available: False
 cuda version: 12.4
 ```
 
-Here, CUDA is available, but it is showing as `False` because you are on the login node.
+This is expected.
+
+`cuda available: False` means you are currently on a login node without a GPU allocated.
+
+`cuda version: 12.4` means the installed PyTorch package was built with CUDA support. CUDA should become available later when the workflow runs inside a Slurm job on a GPU compute node.
 
 ### What to do if the environment file fails
 
@@ -205,7 +295,7 @@ conda activate anvil-forecast
 conda install -y -c conda-forge pandas numpy scikit-learn jupyter nbconvert ipykernel tqdm joblib
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
-
+> **Note:** Do not proceed to the next step until the environment activates successfully.
 ---
 
 ## Step 4 — Edit the Slurm job script
