@@ -19,17 +19,17 @@ The goal is to understand:
 
 # Learning Objectives
 
-By the end of this exercise, you should be able to:
+- By the end of this exercise, you should be able to:
 
-✅ Log into a national cyberinfrastructure resource
+- Log into a national cyberinfrastructure resource
 
-✅ Submit an AI job using a scheduler
+- Submit an AI job using a scheduler
 
-✅ Monitor job execution
+- Monitor job execution
 
-✅ Review benchmark results
+- Review benchmark results
 
-✅ Explain how HPC resources differ from running workloads on a laptop
+- Explain how HPC resources differ from running workloads on a laptop
 
 ---
 
@@ -47,37 +47,38 @@ In a real research project, you may need to perform these setup steps yourself. 
 
 ---
 
-# Step 1: Log Into Anvil
+## Step 1: Open Anvil Shell Access
 
-Open the Anvil Open OnDemand dashboard.
+Go to the Anvil Open OnDemand dashboard.
 
-Log in using your ACCESS credentials.
+Log in with your ACCESS credentials.
 
-From the top navigation menu select:
+Click:
 
-**Clusters → Shell Access**
+**Clusters → Anvil Shell Access**
 
-You should see a terminal window.
+You should see a terminal.
 
 If you do not see a terminal, raise your hand and a workshop helper will assist you.
 
 ---
 
-# Step 2: Navigate to the Workshop Repository
-
-Run:
+## Step 2: Clone the Workshop Repository
 
 ```bash
-cd ~/repos/NAIRR-AI-Unlocked
+mkdir -p ~/repos
+cd ~/repos
+git clone https://github.com/ms-cc-org/NAIRR-AI-Unlocked.git
+cd NAIRR-AI-Unlocked
 ```
 
-Verify your location:
+Confirm:
 
 ```bash
 pwd
 ```
 
-Expected output:
+You should be inside:
 
 ```bash
 ~/repos/NAIRR-AI-Unlocked
@@ -85,9 +86,85 @@ Expected output:
 
 ---
 
-# Step 3: Submit the Workshop Job
+## Step 3: Copy the Dataset
 
-Submit the prepared AI workflow:
+The dataset has been placed in a shared Anvil project directory for this workshop.
+
+Create the expected data folder:
+
+```bash
+mkdir -p data/temperature-us
+```
+
+Copy the dataset:
+
+```bash
+cp -r /anvil/projects/x-cis260907/dataset_shared/* data/temperature-us/
+```
+
+Confirm the data copied correctly:
+
+```bash
+ls data/temperature-us/city_info.csv
+wc -l data/temperature-us/city_info.csv
+```
+
+Expected output:
+
+```bash
+211 data/temperature-us/city_info.csv
+```
+
+If this does not work, raise your hand.
+
+---
+
+## Step 4: Create the Conda Environment
+
+Load Conda:
+
+```bash
+module load conda/2026.03
+conda --version
+```
+
+Create the workshop environment:
+
+```bash
+conda env create -f platforms/anvil/env_exports/anvil-forecast.yml
+```
+
+This may take several minutes. Do not cancel it.
+
+Activate the environment:
+
+```bash
+conda activate anvil-forecast
+```
+
+Confirm Python can load the required packages:
+
+```bash
+python - <<'PY'
+import torch
+import pandas
+import sklearn
+print("Environment ready")
+print("torch:", torch.__version__)
+PY
+```
+
+Expected output includes:
+
+```bash
+Environment ready
+```
+
+---
+
+## Step 5: Submit the Anvil Job
+
+Submit the prepared workshop job:
 
 ```bash
 sbatch platforms/anvil/slurm/run_workshop.slurm
@@ -99,13 +176,13 @@ Expected output:
 Submitted batch job 123456
 ```
 
-Write down your Job ID.
+Write down your job ID.
 
 ---
 
-# Step 4: Monitor the Job
+## Step 6: Monitor the Job
 
-Check job status:
+Check status:
 
 ```bash
 squeue -u $USER
@@ -113,25 +190,25 @@ squeue -u $USER
 
 Common status codes:
 
-| Status | Meaning |
-|----------|----------|
+| Code | Meaning |
+|---|---|
 | PD | Pending |
 | R | Running |
 | CG | Completing |
 
-When the job disappears from the queue, execution has completed.
+When your job disappears from the queue, it has finished.
 
 ---
 
-# Step 5: View Results
+## Step 7: Review Results
 
-Display the benchmark summary:
+View the benchmark summary:
 
 ```bash
 cat results/benchmarks/benchmark_row.csv
 ```
 
-Display model metrics:
+View the model metrics:
 
 ```bash
 cat outputs/metrics/test_metrics.json
