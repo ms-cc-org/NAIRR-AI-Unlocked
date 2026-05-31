@@ -41,7 +41,7 @@ This takes some getting used to if you are new to HPC, but it is the standard mo
 ### SSH into Anvil
 
 ```bash
-ssh <your-access-username>@anvil.rcac.purdue.edu
+ssh <x-your-access-username>@anvil.rcac.purdue.edu
 ```
 
 You will land on a login node (`anvil-login-xx`). This is where you set up your environment and submit jobs. Do not run training jobs here.
@@ -51,7 +51,8 @@ You will land on a login node (`anvil-login-xx`). This is where you set up your 
 Conda is available on Anvil as a module, not installed by default in your PATH:
 
 ```bash
-module load anaconda
+module avail conda
+module load conda/2026.03
 conda --version
 ```
 
@@ -71,9 +72,7 @@ cd NAIRR-AI-Unlocked
 ```
 
 Confirm the clone succeeded:
-```bash
-ls
-```
+`ls`
 
 You should see: `forecasting.ipynb  platforms/  scripts/  outputs/  results/  README.md  WORKSHOP_JETSTREAM2.md  WORKSHOP_ANVIL.md`
 
@@ -86,15 +85,13 @@ You should see: `forecasting.ipynb  platforms/  scripts/  outputs/  results/  RE
 The notebook trains on historical daily temperature data for 210 US cities. The dataset is not stored in Git (too large), so you need to place it at the path the notebook expects before submitting.
 
 **The notebook looks for the dataset here:**
-```
-~/repos/NAIRR-AI-Unlocked/7890488/
-```
+`data/temperature-us/`
 
 **Expected contents:**
-```
-7890488/city_info.csv
-7890488/ABQ.csv
-7890488/ANC.csv
+```bash
+data/temperature-us/city_info.csv
+data/temperature-us/ABQ.csv
+data/temperature-us/ANC.csv
 ... (one CSV per city)
 ```
 
@@ -105,17 +102,7 @@ Anvil compute nodes have restricted outbound internet access, so direct download
 ```bash
 # Run this command on your LOCAL machine (not on Anvil)
 rsync -avP /path/to/your/7890488/ \
-  <your-username>@anvil.rcac.purdue.edu:~/repos/NAIRR-AI-Unlocked/7890488/
-```
-
-If you do not have the dataset locally, download it first:
-```bash
-# On your local machine
-git clone --depth 1 \
-  https://github.com/radames/dataset-historical-daily-temperature-210-US.git \
-  7890488_src
-rsync -avP 7890488_src/ \
-  <your-username>@anvil.rcac.purdue.edu:~/repos/NAIRR-AI-Unlocked/7890488/
+  <your-username>@anvil.rcac.purdue.edu:~/repos/NAIRR-AI-Unlocked/data/temperature-us/
 ```
 
 ### Option B — Copy from a facilitator-provided path
@@ -124,15 +111,14 @@ Your facilitator may have pre-staged the dataset in a shared directory on Anvil.
 
 ```bash
 # Run this on Anvil
-cp -r /path/provided/by/facilitator/7890488 \
-  ~/repos/NAIRR-AI-Unlocked/7890488
+cp -r /anvil/projects/x-cis260907/dataset_shared/* ~/repos/NAIRR-AI-Unlocked/temperature-us/
 ```
 
 ### Verify the dataset is in place
 
 ```bash
-ls 7890488/ | head -10
-wc -l 7890488/city_info.csv
+ls data/temperature-us/ | head -10
+wc -l data/temperature-us/city_info.csv
 ```
 
 You should see a list of CSV files and `city_info.csv` should have 211 lines (1 header + 210 cities). If the directory is empty or missing, do not proceed — the job will fail immediately when it runs.
@@ -147,6 +133,14 @@ The workflow requires specific Python and ML library versions. We use a pre-test
 
 ### Create the environment from the provided file
 
+> **Important:** Enter `module avail cuda`, if the terminal returns *No module(s) or extension(s) found!*, then you're probably on CPU module. To swap to GPU module, use: 
+
+`module swap modtree/cpu modtree/gpu`
+
+Then once again try `module avail cuda`, if you get core applications with cuda, the you are on GPU module. 
+
+### Environment creation:
+
 ```bash
 conda env create -f platforms/anvil/env_exports/anvil-forecast.yml
 ```
@@ -154,21 +148,36 @@ conda env create -f platforms/anvil/env_exports/anvil-forecast.yml
 This installs PyTorch, scikit-learn, pandas, nbconvert, and their dependencies. **It takes 5–15 minutes.** This is normal — do not cancel it.
 
 When it finishes, you will see:
-```
+```bash
 done
 # To activate this environment, use:
 #     conda activate anvil-forecast
 ```
 
-### Test-activate the environment
+## Activate the environment
 
 ```bash
 conda activate anvil-forecast
-python -c "import torch; print('PyTorch:', torch.__version__)"
-conda deactivate
 ```
 
-The Slurm job script activates the environment automatically when the job runs. You are just confirming the install succeeded.
+**Check PyTorch and Cuda versions:**
+```bash
+python - <<'PY'
+> import torch
+> print("torch:", torch.__version__)
+> print("cuda available:", torch.cuda.is_available())
+> print("cuda version:", torch.version.cuda)
+> PY
+```
+
+When it finishes, you will see:
+```bash
+torch: 2.5.1+cu124
+cuda available: False
+cuda version: 12.4
+```
+
+Here, CUDA is available, but it is showing as `False` because you are on the login node.
 
 ### What to do if the environment file fails
 
@@ -179,7 +188,6 @@ conda create -n anvil-forecast python=3.10 -y
 conda activate anvil-forecast
 conda install -y -c conda-forge pandas numpy scikit-learn jupyter nbconvert ipykernel tqdm joblib
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-conda deactivate
 ```
 
 ---
